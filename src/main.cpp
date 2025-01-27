@@ -210,6 +210,9 @@ public:
         for (int i = 0; i < m; ++i) {
             double z = dot_product(X[i], w) + b;
             double f_wb = sigmoid(z);
+
+            f_wb = max(min(f_wb, 1.0 - 1e-15), 1e-15);  // Avoid log(0) or log(1)
+
             cost += -y[i] * log(f_wb) - (1 - y[i]) * log(1 - f_wb);
         }
         return cost / m;
@@ -246,15 +249,6 @@ public:
         return make_tuple(dj_dw, dj_db);
     }
 
-    vector<double> predict_proba(const vector<vector<double> >& X) {
-        vector<double> probabilities;
-        for (const auto& x : X) {
-            double z = dot_product(x, w) + b;
-            probabilities.push_back(sigmoid(z));
-        }
-        return probabilities;
-    }
-
     vector<int> predict(const vector<vector<double> >& X) {
 
         vector<int> predictions;
@@ -286,7 +280,7 @@ public:
 
         
             // Optional: Print cost every 100 iterations
-            if (i % 100 == 0) {
+            if (i % 1000 == 0) {
                 double cost = compute_cost(X, y, w_in, b_in);
                 cout << "Iteration " << i << ": Cost = " << cost << endl;
             }
@@ -295,12 +289,38 @@ public:
         return make_tuple(w_history, J_history);
     }
 
+    // Normalize each feature column
+    void normalize_features(vector<vector<double>>& X) {
+        for (int j = 0; j < X[0].size(); ++j) {
+            double mean = 0.0;
+            double stddev = 0.0;
+            
+            // Compute mean of column
+            for (const auto& row : X) {
+                mean += row[j];
+            }
+            mean /= X.size();
+            
+            // Compute standard deviation of column
+            for (const auto& row : X) {
+                stddev += (row[j] - mean) * (row[j] - mean);
+            }
+            stddev = sqrt(stddev / X.size());
+            
+            // Normalize the column
+            for (auto& row : X) {
+                row[j] = (row[j] - mean) / stddev;
+            }
+        }
+    }
+
+
 };
 
 
 int main() {
     Dataset dataset;
-    LogisticRegression model(0.0001, 1000);
+    LogisticRegression model(0.00001, 10000);
 
     // Vectors for training and testing data
     vector<DataPoint> trainingData;
@@ -318,6 +338,10 @@ int main() {
         vector<vector<double> > X_train;
         vector<double> y_train;
 
+        // Prepare testing data
+        vector<vector<double> > X_test;
+        vector<int> y_test;
+
         for (const auto& dp : trainingData) {
             X_train.push_back({
                 dp.funding_total_usd, dp.funding_rounds, dp.age_first_funding_year,
@@ -326,6 +350,16 @@ int main() {
                 dp.is_consulting
             });
             y_train.push_back(dp.is_successful);
+        }
+
+        for (const auto& dp : testingData) {
+            X_test.push_back({
+                dp.funding_total_usd, dp.funding_rounds, dp.age_first_funding_year,
+                dp.relationships, dp.is_software, dp.is_web, dp.is_mobile, dp.is_enterprise,
+                dp.is_advertising, dp.is_gamesvideo, dp.is_ecommerce, dp.is_biotech,
+                dp.is_consulting
+            });
+            y_test.push_back(dp.is_successful);
         }
     
         // Display dataset and feature matrix information
@@ -339,22 +373,17 @@ int main() {
             weight = ((double)rand() / RAND_MAX) * 0.01; // Small random values
         }
 
+        cout << "Before Normalization:" << endl;
+        cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
+
+        model.normalize_features(X_train);
+        model.normalize_features(X_test);
+
+        cout << "After Normalization:" << endl;
+        cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
+
         // Train the model
         tie(w_history, J_history) = model.gradient_descent(X_train, y_train, model.w, model.b, model.num_iterations, model.learning_rate);
-        
-        // Prepare testing data
-        vector<vector<double> > X_test;
-        vector<int> y_test;
-
-        for (const auto& dp : testingData) {
-            X_test.push_back({
-                dp.funding_total_usd, dp.funding_rounds, dp.age_first_funding_year,
-                dp.relationships, dp.is_software, dp.is_web, dp.is_mobile, dp.is_enterprise,
-                dp.is_advertising, dp.is_gamesvideo, dp.is_ecommerce, dp.is_biotech,
-                dp.is_consulting
-            });
-            y_test.push_back(dp.is_successful);
-        }
 
         // Predict and evaluate
         vector<int> predictions = model.predict(X_test);
