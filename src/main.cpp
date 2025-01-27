@@ -373,17 +373,28 @@ int main() {
             weight = ((double)rand() / RAND_MAX) * 0.01; // Small random values
         }
 
-        cout << "Before Normalization:" << endl;
-        cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
+        //cout << "Before Normalization:" << endl;
+        //cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
 
         model.normalize_features(X_train);
         model.normalize_features(X_test);
 
-        cout << "After Normalization:" << endl;
-        cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
+        //cout << "After Normalization:" << endl;
+        //cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
 
         // Train the model
         tie(w_history, J_history) = model.gradient_descent(X_train, y_train, model.w, model.b, model.num_iterations, model.learning_rate);
+
+        vector<int> predictions_train = model.predict(X_train);
+
+        int correct_train = 0;
+        for (size_t i = 0; i < y_train.size(); ++i) {
+            if (predictions_train[i] == y_train[i]) {
+                ++correct_train;
+            }
+        }
+        double accuracy_train = static_cast<double>(correct_train) / y_train.size();
+        cout << "Training Accuracy: " << accuracy_train * 100 << "%" << endl;
 
         // Predict and evaluate
         vector<int> predictions = model.predict(X_test);
