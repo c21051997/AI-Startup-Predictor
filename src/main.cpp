@@ -47,10 +47,10 @@ int stringToInt(const string &str) {
     }
 }
 
-// Utility function to convert strings to integers (used for missing values)
+// Utility function to convert strings to double (used for missing values)
 int stringToDouble(const string &str) {
     try {
-        // stoi converts string to int
+        // stoi converts string to double
         return stod(str);
     } catch (...) {
         return -1;  // Return -1 if the conversion fails (e.g., missing data)
@@ -161,26 +161,32 @@ public:
     }
 
     // Split data into testing and training
-    void splitData(vector<DataPoint>& trainingData, vector<DataPoint>& testingData){
-        double ratio = 0.8;
-        int splitIndex = data_points.size() * ratio;
+    void splitData(vector<DataPoint>& allData, vector<DataPoint>& trainingData, vector<DataPoint>& devData, vector<DataPoint>& testingData){
+        double trainRatio = 0.6;
+        double devRatio = 0.2;
+
+        int trainSplitIndex = data_points.size() * trainRatio;
+        int devSplitIndex = trainSplitIndex + data_points.size() * devRatio;
 
         random_device rd;         // Random device for seeding
         default_random_engine rng(rd()); 
 
         shuffle(data_points.begin(), data_points.end(), rng);
 
-        trainingData.reserve(splitIndex);                     // Allocate space for training data
-        testingData.reserve(data_points.size() - splitIndex);
+        trainingData.reserve(trainSplitIndex);                     // Allocate space for training data
+        devData.reserve(devSplitIndex - trainSplitIndex);
+        testingData.reserve(data_points.size() - devSplitIndex);
 
-        copy(data_points.begin(), data_points.begin() + splitIndex, back_inserter(trainingData));
-        copy(data_points.begin() + splitIndex + 1, data_points.end(), back_inserter(testingData));
+        copy(data_points.begin(), data_points.end(), back_inserter(allData));
+        copy(data_points.begin(), data_points.begin() + trainSplitIndex, back_inserter(trainingData));
+        copy(data_points.begin() + trainSplitIndex, data_points.begin() + devSplitIndex, back_inserter(devData));
+        copy(data_points.begin() + devSplitIndex, data_points.end(), back_inserter(testingData));
     }
 
 
 };
 
-
+// Logistic Regression class, including sigmoid, dot product, cost and gradient descent
 class LogisticRegression {
 public:  
 
@@ -192,10 +198,12 @@ public:
     LogisticRegression(double lr = 0.01, int iterations = 1000)
         : learning_rate(lr), num_iterations(iterations), b(0.0), w() {}
 
+    // Sigmoid function
     double sigmoid(double z) {
         return 1 / (1 + exp(-z));
     }
 
+    // Dot product function
     double dot_product(const vector<double>& a, const vector<double>& b) {
         double result = 0.0;
         for (size_t i = 0; i < a.size(); ++i) {
@@ -204,6 +212,7 @@ public:
         return result;
     }
 
+    // Cost function
     double compute_cost(const vector<vector<double> >& X, const vector<double>& y, vector<double>& w, double& b) {
         int m = X.size(); // Number of examples
         double cost = 0.0;
@@ -249,6 +258,7 @@ public:
         return make_tuple(dj_dw, dj_db);
     }
 
+    // Predict function
     vector<int> predict(const vector<vector<double> >& X) {
 
         vector<int> predictions;
@@ -260,7 +270,8 @@ public:
         return predictions;
     }
 
-    tuple<vector<vector<double> >, vector<double>> gradient_descent(const vector<vector<double> >& X, const vector<double>& y, vector<double>& w_in, double& b_in, int num_iterations, double learning_rate) {
+    // Gradient descent function
+    void gradient_descent(const vector<vector<double> >& X, const vector<double>& y, vector<double>& w_in, double& b_in, int num_iterations, double learning_rate) {
         int m = X.size();    // Number of examples
         int n = X[0].size(); // Number of features
 
@@ -277,71 +288,174 @@ public:
                 w_in[j] -= learning_rate * dj_dw[j];
             }
             b_in -= learning_rate * dj_db;
+            
+            // Inside gradient descent
+            //cout << "Iteration " << i << ": Bias (b) = " << b_in << endl;
+            //cout << "Iteration " << i << ": Gradient of Bias (dj_db) = " << dj_db << endl;
 
         
             // Optional: Print cost every 100 iterations
             if (i % 1000 == 0) {
                 double cost = compute_cost(X, y, w_in, b_in);
-                cout << "Iteration " << i << ": Cost = " << cost << endl;
+                //cout << "Iteration " << i << ": Cost = " << cost << endl;
             }
         }
-
-        return make_tuple(w_history, J_history);
     }
 
-    // Normalize each feature column
-    void normalize_features(vector<vector<double>>& X) {
-        for (int j = 0; j < X[0].size(); ++j) {
-            double mean = 0.0;
-            double stddev = 0.0;
-            
-            // Compute mean of column
-            for (const auto& row : X) {
-                mean += row[j];
+    void normalize_features(vector<vector<double>>& X, const vector<double>& mean, const vector<double>& stddev) {
+        // Loop through the first 4 features (columns)
+        for (int j = 0; j < 4; ++j) {
+            // Handle case where stddev is zero (zero variance)
+            if (stddev[j] == 0.0) {
+                cout << "Warning: Feature " << j << " has zero variance. Skipping normalization." << endl;
+                continue; // Skip normalization for this feature
             }
-            mean /= X.size();
-            
-            // Compute standard deviation of column
-            for (const auto& row : X) {
-                stddev += (row[j] - mean) * (row[j] - mean);
-            }
-            stddev = sqrt(stddev / X.size());
-            
-            // Normalize the column
+
+            // Normalize the feature using provided mean and stddev
             for (auto& row : X) {
-                row[j] = (row[j] - mean) / stddev;
+                row[j] = (row[j] - mean[j]) / stddev[j];
             }
         }
     }
 
+
+   tuple<vector<double>, vector<double>> calc_mean_std(vector<vector<double>>& X_alldata, vector<double>& mean, vector<double>&stddev){
+        int num_features = X_alldata[0].size();
+
+        // Step 1: Calculate the mean for each feature (column)
+        for (const auto& row : X_alldata) {
+            for (int j = 0; j < num_features; ++j) {
+                mean[j] += row[j];
+            }
+        }
+        for (double& m : mean) {
+            m /= X_alldata.size();  // Mean is the sum of all values divided by the number of samples
+        }
+
+        // Step 2: Calculate the standard deviation for each feature (column)
+        for (const auto& row : X_alldata) {
+            for (int j = 0; j < num_features; ++j) {
+                stddev[j] += (row[j] - mean[j]) * (row[j] - mean[j]);
+            }
+        }
+        for (double& s : stddev) {
+            s = sqrt(s / (X_alldata.size() - 1));  // Sample standard deviation (using N-1)
+        }
+
+        return make_tuple(mean, stddev);
+        }
 
 };
+
+void predict_user_startup(LogisticRegression& model, vector<double>& mean, vector<double>&stddev) {
+    vector<double> user_input;
+
+    cout << "Enter details about your startup:" << endl;
+    double funding_total_usd, funding_rounds, age_first_funding_year, relationships;
+    double is_software, is_web, is_mobile, is_enterprise, is_advertising, is_gamesvideo, is_ecommerce, is_biotech, is_consulting;
+
+    cout << "Funding Total (USD): ";
+    cin >> funding_total_usd;
+    cout << "Funding Rounds: ";
+    cin >> funding_rounds;
+    cout << "Age at First Funding Year: ";
+    cin >> age_first_funding_year;
+    cout << "Number of Relationships: ";
+    cin >> relationships;
+
+    cout << "Is your company Software-related? (1 for Yes, 0 for No): ";
+    cin >> is_software;
+    cout << "Is it Web-based? (1 for Yes, 0 for No): ";
+    cin >> is_web;
+    cout << "Is it Mobile-focused? (1 for Yes, 0 for No): ";
+    cin >> is_mobile;
+    cout << "Is it Enterprise-oriented? (1 for Yes, 0 for No): ";
+    cin >> is_enterprise;
+    cout << "Is it focused on Advertising? (1 for Yes, 0 for No): ";
+    cin >> is_advertising;
+    cout << "Is it in Games/Video? (1 for Yes, 0 for No): ";
+    cin >> is_gamesvideo;
+    cout << "Is it in E-commerce? (1 for Yes, 0 for No): ";
+    cin >> is_ecommerce;
+    cout << "Is it in Biotech? (1 for Yes, 0 for No): ";
+    cin >> is_biotech;
+    cout << "Is it a Consulting company? (1 for Yes, 0 for No): ";
+    cin >> is_consulting;
+
+    // Prepare user input vector for continuous and categorical features separately
+    vector<double> continuous_input = {
+        funding_total_usd, funding_rounds, age_first_funding_year, relationships
+    };
+    vector<double> categorical_input = {
+        is_software, is_web, is_mobile, is_enterprise,
+        is_advertising, is_gamesvideo, is_ecommerce, is_biotech, is_consulting
+    };
+
+    // Normalize continuous features only
+    vector<vector<double>> continuous_input_vector = {continuous_input};
+    model.normalize_features(continuous_input_vector, mean, stddev);
+
+    // Combine normalized continuous features with original categorical features
+    user_input.clear();
+    user_input.insert(user_input.end(), continuous_input_vector[0].begin(), continuous_input_vector[0].end());
+    user_input.insert(user_input.end(), categorical_input.begin(), categorical_input.end());
+
+    cout << "Normalized user input: ";
+    for (const auto& feature : user_input) {
+        cout << feature << " ";  // This will print each normalized feature
+    }
+    cout << endl;
+
+    // Predict success probability
+    double probability = model.sigmoid(model.dot_product(user_input, model.w) + model.b);
+
+    // Output the result
+    cout << "Your startup's predicted success probability is: " << probability * 100 << "%" << endl;
+    if (probability >= 0.5) {
+        cout << "Prediction: Likely to Succeed!" << endl;
+    } else {
+        cout << "Prediction: Less likely to Succeed." << endl;
+    }
+}
 
 
 int main() {
     Dataset dataset;
-    LogisticRegression model(0.00001, 10000);
+    LogisticRegression model(0.1, 100);
 
     // Vectors for training and testing data
+    vector<DataPoint> allData;
     vector<DataPoint> trainingData;
+    vector<DataPoint> devData;
     vector<DataPoint> testingData;
 
-
-    vector<double> J_history; 
-    vector<vector<double> > w_history;
-
     if (dataset.loadFromCSV("startup_data.csv")) {
-        dataset.splitData(trainingData, testingData);
-        cout << "Data loaded and preprocessed successfully!" << endl;
+        dataset.displayData();
+        dataset.splitData(allData, trainingData, testingData, devData);
+        //cout << "Data loaded and preprocessed successfully!" << endl;
 
+        vector<vector<double> > X_allData;
         // Step 2: Prepare feature matrix (X) and labels (y)
         vector<vector<double> > X_train;
         vector<double> y_train;
+
+        vector<vector<double> > X_dev;
+        vector<double> y_dev;
 
         // Prepare testing data
         vector<vector<double> > X_test;
         vector<int> y_test;
 
+        for (const auto& dp : allData) {
+            X_allData.push_back({
+                dp.funding_total_usd, dp.funding_rounds, dp.age_first_funding_year,
+                dp.relationships, dp.is_software, dp.is_web, dp.is_mobile, dp.is_enterprise,
+                dp.is_advertising, dp.is_gamesvideo, dp.is_ecommerce, dp.is_biotech,
+                dp.is_consulting
+            });
+        }
+
+        // put these into function
         for (const auto& dp : trainingData) {
             X_train.push_back({
                 dp.funding_total_usd, dp.funding_rounds, dp.age_first_funding_year,
@@ -350,6 +464,16 @@ int main() {
                 dp.is_consulting
             });
             y_train.push_back(dp.is_successful);
+        }
+
+        for (const auto& dp : devData) {
+            X_dev.push_back({
+                dp.funding_total_usd, dp.funding_rounds, dp.age_first_funding_year,
+                dp.relationships, dp.is_software, dp.is_web, dp.is_mobile, dp.is_enterprise,
+                dp.is_advertising, dp.is_gamesvideo, dp.is_ecommerce, dp.is_biotech,
+                dp.is_consulting
+            });
+            y_dev.push_back(dp.is_successful);
         }
 
         for (const auto& dp : testingData) {
@@ -361,29 +485,43 @@ int main() {
             });
             y_test.push_back(dp.is_successful);
         }
-    
+
         // Display dataset and feature matrix information
         //dataset.displayData();
-        cout << "Total Data Points: " << dataset.data_points.size() << endl;
-        cout << "Training Data: " << trainingData.size() << ", Testing Data: " << testingData.size() << endl;
-        cout << "X_train: " << X_train.size() << ", y_train: " << y_train.size() << endl;
+        //cout << "Total Data Points: " << dataset.data_points.size() << endl;
+        //cout << "Training Data: " << trainingData.size() << ", Testing Data: " << testingData.size() << endl;
+        //cout << "X_train: " << X_train.size() << ", y_train: " << y_train.size() << endl;
         
         model.w = vector<double>(X_train[0].size());
         for (double& weight : model.w) {
             weight = ((double)rand() / RAND_MAX) * 0.01; // Small random values
         }
 
-        //cout << "Before Normalization:" << endl;
-        //cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
+        ////cout << "Before Normalization:" << endl;
+        ////cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
 
-        model.normalize_features(X_train);
-        model.normalize_features(X_test);
+        int num_features = X_allData[0].size();
+        vector<double> mean(num_features, 0.0);
+        vector<double> stddev(num_features, 0.0);
 
-        //cout << "After Normalization:" << endl;
-        //cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
+        model.calc_mean_std(X_allData, mean, stddev);
+        
+        model.normalize_features(X_train, mean, stddev);
+        model.normalize_features(X_dev, mean, stddev);
+        model.normalize_features(X_test, mean, stddev);
+
+        for (size_t i = 0; i < model.w.size(); ++i) {
+            cout << "Weight[" << i << "]: " << model.w[i] << endl;
+        }
+
+        cout << "Bias (b): " << model.b << endl;
+
+
+        ////cout << "After Normalization:" << endl;
+        ////cout << "X_train size: " << X_train.size() << ", X_test size: " << X_test.size() << endl;
 
         // Train the model
-        tie(w_history, J_history) = model.gradient_descent(X_train, y_train, model.w, model.b, model.num_iterations, model.learning_rate);
+        model.gradient_descent(X_train, y_train, model.w, model.b, model.num_iterations, model.learning_rate);
 
         vector<int> predictions_train = model.predict(X_train);
 
@@ -396,6 +534,17 @@ int main() {
         double accuracy_train = static_cast<double>(correct_train) / y_train.size();
         cout << "Training Accuracy: " << accuracy_train * 100 << "%" << endl;
 
+        vector<int> predictions_dev = model.predict(X_dev);
+
+        int correct_dev = 0;
+        for (size_t i = 0; i < y_dev.size(); ++i) {
+            if (predictions_dev[i] == y_dev[i]) {
+                ++correct_dev;
+            }
+        }
+        double accuracy_dev= static_cast<double>(correct_dev) / y_dev.size();
+        cout << "Dev Accuracy: " << accuracy_dev * 100 << "%" << endl;
+
         // Predict and evaluate
         vector<int> predictions = model.predict(X_test);
 
@@ -406,7 +555,16 @@ int main() {
             }
         }
         double accuracy = static_cast<double>(correct) / y_test.size();
-        cout << "Model Accuracy: " << accuracy * 100 << "%" << endl;
+        cout << "Test Accuracy: " << accuracy * 100 << "%" << endl;
+
+        char choice;
+        do {
+            cout << "\nWould you like to predict success for your startup? (y/n): ";
+            cin >> choice;
+            if (choice == 'y' || choice == 'Y') {
+                predict_user_startup(model, mean, stddev);
+            }
+        } while (choice == 'y' || choice == 'Y');
 
 
     } else {
