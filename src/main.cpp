@@ -94,10 +94,10 @@ int main() {
         std::vector<std::vector<double> > X_allData;
         // Step 2: Prepare feature matrix (X) and labels (y)
         std::vector<std::vector<double> > X_train;
-        std::vector<double> y_train;
+        std::vector<int> y_train;
 
         std::vector<std::vector<double> > X_dev;
-        std::vector<double> y_dev;
+        std::vector<int> y_dev;
 
         // Prepare testing data
         std::vector<std::vector<double> > X_test;

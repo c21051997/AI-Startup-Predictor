@@ -19,7 +19,7 @@ double LogisticRegression::dot_product(const std::vector<double>& a, const std::
     return result;
 }
 
-double LogisticRegression::compute_cost(const std::vector<std::vector<double>>& X, const std::vector<double>& y, 
+double LogisticRegression::compute_cost(const std::vector<std::vector<double>>& X, const std::vector<int>& y, 
                                         std::vector<double>& w, double& b) {
     // Cost function implementation
     int m = X.size(); // Number of examples
@@ -35,16 +35,17 @@ double LogisticRegression::compute_cost(const std::vector<std::vector<double>>& 
     return cost / m;
 }
 
-std::tuple<std::vector<double>, double> LogisticRegression::compute_gradient(const std::vector<std::vector<double>>& X, 
-                                                                             const std::vector<double>& y,
-                                                                             std::vector<double>& w, double& b) {
+void LogisticRegression::compute_gradient(const std::vector<std::vector<double>>& X, 
+                                                                             const std::vector<int>& y,
+                                                                             std::vector<double>& w, double& b, double& dj_db,
+                                                                             std::vector<double>& dj_dw) {
     // Gradient computation logic
     int m = X.size(); // Number of examples
     int n = X[0].size(); // Number of features
 
-    std::vector<double> dj_dw = std::vector<double>(n, 0.0);
-    double dj_db = 0.0;
-
+    dj_db = 0.0;
+    std::fill(dj_dw.begin(), dj_dw.end(), 0.0);
+    
     for (int i = 0; i < m; ++i) {
         double z = dot_product(X[i], w) + b;
         double f_wb = sigmoid(z);
@@ -63,11 +64,9 @@ std::tuple<std::vector<double>, double> LogisticRegression::compute_gradient(con
         dj_dw[j] /= m;
     }
     dj_db /= m;
-    //std::cout << "dj_dw: " << dj_dw[0] << ", dj_db: " << dj_db << std::endl;
-    return make_tuple(dj_dw, dj_db);
 }
 
-void LogisticRegression::gradient_descent(const std::vector<std::vector<double>>& X, const std::vector<double>& y, 
+void LogisticRegression::gradient_descent(const std::vector<std::vector<double>>& X, const std::vector<int>& y, 
                                           std::vector<double>& w_in, double& b_in, int num_iterations, double learning_rate) {
     // Gradient descent logic
     int m = X.size();    // Number of examples
@@ -80,7 +79,7 @@ void LogisticRegression::gradient_descent(const std::vector<std::vector<double>>
         std::vector<double> dj_dw(n, 0.0);
         double dj_db = 0.0;
 
-        tie(dj_dw, dj_db) = compute_gradient(X, y, w_in, b_in);
+        compute_gradient(X, y, w_in, b_in, dj_db, dj_dw);
 
         for (int j = 0; j < n; ++j) {
             w_in[j] -= learning_rate * dj_dw[j];

@@ -10,12 +10,13 @@ public:
 
     double sigmoid(double z);
     double dot_product(const std::vector<double>& a, const std::vector<double>& b);
-    double compute_cost(const std::vector<std::vector<double>>& X, const std::vector<double>& y, 
+    double compute_cost(const std::vector<std::vector<double>>& X, const std::vector<int>& y, 
                         std::vector<double>& w, double& b);
-    std::tuple<std::vector<double>, double> compute_gradient(const std::vector<std::vector<double>>& X, 
-                                                             const std::vector<double>& y,
-                                                             std::vector<double>& w, double& b);
-    void gradient_descent(const std::vector<std::vector<double>>& X, const std::vector<double>& y, 
+    void compute_gradient(const std::vector<std::vector<double>>& X, 
+                                                             const std::vector<int>& y,
+                                                             std::vector<double>& w, double& b, double& dj_db,
+                                                             std::vector<double>& dj_dw);
+    void gradient_descent(const std::vector<std::vector<double>>& X, const std::vector<int>& y, 
                           std::vector<double>& w_in, double& b_in, int num_iterations, double learning_rate);
     std::vector<int> predict(const std::vector<std::vector<double>>& X);
     void normalize_features(std::vector<std::vector<double>>& X, const std::vector<double>& mean, const std::vector<double>& stddev);
