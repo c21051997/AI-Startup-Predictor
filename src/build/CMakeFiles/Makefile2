@@ -63,10 +63,12 @@ CMAKE_BINARY_DIR = "/Users/harridavies/Desktop/Startup Predictor/src/build"
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/StartupPredictor.dir/all
 all: CMakeFiles/MyTests.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
+codegen: CMakeFiles/StartupPredictor.dir/codegen
 codegen: CMakeFiles/MyTests.dir/codegen
 .PHONY : codegen
 
@@ -75,14 +77,47 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/StartupPredictor.dir/clean
 clean: CMakeFiles/MyTests.dir/clean
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/StartupPredictor.dir
+
+# All Build rule for target.
+CMakeFiles/StartupPredictor.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" --progress-num=3,4,5 "Built target StartupPredictor"
+.PHONY : CMakeFiles/StartupPredictor.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/StartupPredictor.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/StartupPredictor.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" 0
+.PHONY : CMakeFiles/StartupPredictor.dir/rule
+
+# Convenience name for target.
+StartupPredictor: CMakeFiles/StartupPredictor.dir/rule
+.PHONY : StartupPredictor
+
+# codegen rule for target.
+CMakeFiles/StartupPredictor.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" --progress-num=3,4,5 "Finished codegen for target StartupPredictor"
+.PHONY : CMakeFiles/StartupPredictor.dir/codegen
+
+# clean rule for target.
+CMakeFiles/StartupPredictor.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/clean
+.PHONY : CMakeFiles/StartupPredictor.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/MyTests.dir
 
 # All Build rule for target.
-CMakeFiles/MyTests.dir/all:
+CMakeFiles/MyTests.dir/all: CMakeFiles/StartupPredictor.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MyTests.dir/build.make CMakeFiles/MyTests.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MyTests.dir/build.make CMakeFiles/MyTests.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" --progress-num=1,2 "Built target MyTests"
@@ -90,7 +125,7 @@ CMakeFiles/MyTests.dir/all:
 
 # Build rule for subdir invocation for target.
 CMakeFiles/MyTests.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" 2
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/MyTests.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles" 0
 .PHONY : CMakeFiles/MyTests.dir/rule

@@ -95,6 +95,7 @@ MyTests_EXTERNAL_OBJECTS =
 
 MyTests: CMakeFiles/MyTests.dir/test.cpp.o
 MyTests: CMakeFiles/MyTests.dir/build.make
+MyTests: libStartupPredictor.a
 MyTests: /opt/homebrew/opt/googletest/lib/libgtest.a
 MyTests: /opt/homebrew/opt/googletest/lib/libgtest_main.a
 MyTests: CMakeFiles/MyTests.dir/link.txt

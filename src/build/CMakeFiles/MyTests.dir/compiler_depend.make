@@ -907,6 +907,9 @@ CMakeFiles/MyTests.dir/test.cpp.o: /Users/harridavies/Desktop/Startup\ Predictor
   /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/stdint.h \
+  /Users/harridavies/Desktop/Startup\ Predictor/src/DataPoint.h \
+  /Users/harridavies/Desktop/Startup\ Predictor/src/Dataset.h \
+  /Users/harridavies/Desktop/Startup\ Predictor/src/LogisticRegression.h \
   /opt/homebrew/opt/googletest/include/gtest/gtest-assertion-result.h \
   /opt/homebrew/opt/googletest/include/gtest/gtest-death-test.h \
   /opt/homebrew/opt/googletest/include/gtest/gtest-matchers.h \
@@ -945,6 +948,8 @@ CMakeFiles/MyTests.dir/test.cpp.o: /Users/harridavies/Desktop/Startup\ Predictor
 /opt/homebrew/opt/googletest/include/gtest/gtest-matchers.h:
 
 /opt/homebrew/opt/googletest/include/gtest/gtest-death-test.h:
+
+/Users/harridavies/Desktop/Startup\ Predictor/src/DataPoint.h:
 
 /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/stdint.h:
 
@@ -1207,6 +1212,8 @@ CMakeFiles/MyTests.dir/test.cpp.o: /Users/harridavies/Desktop/Startup\ Predictor
 /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/cassert:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/atomic:
+
+/Users/harridavies/Desktop/Startup\ Predictor/src/LogisticRegression.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/any:
 
@@ -2075,6 +2082,8 @@ CMakeFiles/MyTests.dir/test.cpp.o: /Users/harridavies/Desktop/Startup\ Predictor
 /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__hash_table:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__concepts/invocable.h:
+
+/Users/harridavies/Desktop/Startup\ Predictor/src/Dataset.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__atomic/atomic_sync.h:
 

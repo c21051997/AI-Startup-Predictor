@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libStartupPredictor.a CMakeFiles/StartupPredictor.dir/LogisticRegression.cpp.o CMakeFiles/StartupPredictor.dir/Dataset.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libStartupPredictor.a

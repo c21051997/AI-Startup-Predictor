@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include "LogisticRegression.h"
+#include "Dataset.h"
 
 // Function to test
 int Add(int a, int b) {
@@ -31,6 +33,19 @@ TEST(SubtractionTest, HandlesNegativeNumbers) {
     EXPECT_EQ(Subtract(-10, 20), -30); // -10 - 20 = -30
 }
 
+// Test for stringToInt utility function
+TEST(DatasetTest, StringToIntValidInput) {
+    Dataset dataset;
+    EXPECT_EQ(dataset.stringToInt("123"), 123);
+    EXPECT_EQ(dataset.stringToInt("-45"), -45);
+    EXPECT_EQ(dataset.stringToInt("0"), 0);
+}
+
+TEST(DatasetTest, StringToIntInvalidInput) {
+    Dataset dataset;
+    EXPECT_THROW(dataset.stringToInt("abc"), std::invalid_argument);
+    EXPECT_THROW(dataset.stringToInt("99999999999999999999"), std::out_of_range);
+}
 
 // Main function for running all tests
 int main(int argc, char **argv) {

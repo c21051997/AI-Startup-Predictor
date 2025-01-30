@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named StartupPredictor
+
+# Build rule for target.
+StartupPredictor: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 StartupPredictor
+.PHONY : StartupPredictor
+
+# fast build rule for target.
+StartupPredictor/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/build
+.PHONY : StartupPredictor/fast
+
+#=============================================================================
 # Target rules for targets named MyTests
 
 # Build rule for target.
@@ -128,6 +141,54 @@ MyTests: cmake_check_build_system
 MyTests/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MyTests.dir/build.make CMakeFiles/MyTests.dir/build
 .PHONY : MyTests/fast
+
+Dataset.o: Dataset.cpp.o
+.PHONY : Dataset.o
+
+# target to build an object file
+Dataset.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/Dataset.cpp.o
+.PHONY : Dataset.cpp.o
+
+Dataset.i: Dataset.cpp.i
+.PHONY : Dataset.i
+
+# target to preprocess a source file
+Dataset.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/Dataset.cpp.i
+.PHONY : Dataset.cpp.i
+
+Dataset.s: Dataset.cpp.s
+.PHONY : Dataset.s
+
+# target to generate assembly for a file
+Dataset.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/Dataset.cpp.s
+.PHONY : Dataset.cpp.s
+
+LogisticRegression.o: LogisticRegression.cpp.o
+.PHONY : LogisticRegression.o
+
+# target to build an object file
+LogisticRegression.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/LogisticRegression.cpp.o
+.PHONY : LogisticRegression.cpp.o
+
+LogisticRegression.i: LogisticRegression.cpp.i
+.PHONY : LogisticRegression.i
+
+# target to preprocess a source file
+LogisticRegression.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/LogisticRegression.cpp.i
+.PHONY : LogisticRegression.cpp.i
+
+LogisticRegression.s: LogisticRegression.cpp.s
+.PHONY : LogisticRegression.s
+
+# target to generate assembly for a file
+LogisticRegression.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/StartupPredictor.dir/build.make CMakeFiles/StartupPredictor.dir/LogisticRegression.cpp.s
+.PHONY : LogisticRegression.cpp.s
 
 test.o: test.cpp.o
 .PHONY : test.o
@@ -162,6 +223,13 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... MyTests"
+	@echo "... StartupPredictor"
+	@echo "... Dataset.o"
+	@echo "... Dataset.i"
+	@echo "... Dataset.s"
+	@echo "... LogisticRegression.o"
+	@echo "... LogisticRegression.i"
+	@echo "... LogisticRegression.s"
 	@echo "... test.o"
 	@echo "... test.i"
 	@echo "... test.s"
