@@ -69,6 +69,8 @@
         "map": "cpp",
         "optional": "cpp",
         "numeric": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "__hash_table": "cpp",
+        "filesystem": "cpp"
     }
 }

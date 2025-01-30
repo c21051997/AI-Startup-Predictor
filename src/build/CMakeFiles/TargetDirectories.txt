@@ -1,0 +1,3 @@
+/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles/MyTests.dir
+/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles/edit_cache.dir
+/Users/harridavies/Desktop/Startup Predictor/src/build/CMakeFiles/rebuild_cache.dir
